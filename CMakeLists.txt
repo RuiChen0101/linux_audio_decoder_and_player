@@ -2,12 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(INC_LIST
-  "include/player/player.h"
   "include/decoder/decoder.h"
+  "include/decoder/ffmpeg_decoder.h"
+  "include/player/player.h"
 )
 
 set(SRC_LIST
   "src/decoder/decoder.cpp"
+  "src/decoder/ffmpeg_decoder.cpp"
   "src/player/player.cpp"
   "main.cpp"
 )
@@ -16,8 +18,8 @@ set(LIB_LIST
   "-lasound"
   "-lavformat"
   "-lavcodec"
-  "-lavdevice"
   "-lavutil"
+  "-lswresample"
 )
 
 set(COMPILE_OPTION -std=c++17 -Wfatal-errors)
