@@ -2,6 +2,6 @@
 
 Decoder::~Decoder(){}
 
-void Decoder::setOutputBufferSize(int size){
-  outputBufferSize = size;
+bool Decoder::finished() const{
+  return isFinished;
 }

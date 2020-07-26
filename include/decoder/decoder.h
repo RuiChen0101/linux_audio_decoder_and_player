@@ -1,16 +1,17 @@
 #ifndef DECODER_H
 #define DECODER_H
 
+#include <functional>
+
 class Decoder{
 public:
   virtual ~Decoder();
-  virtual void open(char* const) = 0;
-  virtual void setOutputBufferSize(int);
-  virtual void* getSample() = 0;
-  virtual bool finished() = 0;
+  virtual void open(char* const fileName) = 0;
   virtual void release() = 0;
+  virtual void decode(int samples, std::function<void(void*, int)> callback) = 0;
+  bool finished() const;
 protected:
-  int outputBufferSize;
+  bool isFinished = false;
 };
 
 #endif

@@ -5,12 +5,16 @@ set(INC_LIST
   "include/decoder/decoder.h"
   "include/decoder/ffmpeg_decoder.h"
   "include/player/player.h"
+  "include/player/alsa_player.h"
+  "include/player/pcm_dumper.h"
 )
 
 set(SRC_LIST
   "src/decoder/decoder.cpp"
   "src/decoder/ffmpeg_decoder.cpp"
   "src/player/player.cpp"
+  "src/player/alsa_player.cpp"
+  "src/player/pcm_dumper.cpp"
   "main.cpp"
 )
 

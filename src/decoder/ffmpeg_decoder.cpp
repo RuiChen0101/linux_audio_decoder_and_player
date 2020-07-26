@@ -73,40 +73,40 @@ void FFmpegDecoder::open(char* const fileName){
   swr_init(swrCtx);
 }
 
-bool FFmpegDecoder::getPacket(){
+void FFmpegDecoder::decode(int samples, std::function<void(void*, int)> callback){
+  int maxbufferSize = av_samples_get_buffer_size(NULL, codecCtx->channels, samples, codecCtx->sample_fmt, 1);
+  std::cout << maxbufferSize << std::endl;
   AVPacket* packet = av_packet_alloc();
-  frame = av_frame_alloc();
+  AVFrame* frame = av_frame_alloc();
+  if(packet == NULL || frame == NULL){
+    throw(std::runtime_error("FFmpegDecoder error: packet or frame alloc fail"));
+  }
+  uint8_t* buffer = (uint8_t*)av_malloc(maxbufferSize);
   while (av_read_frame(formatCtx, packet) >= 0) {
     if (packet->stream_index == audioStream) {
       if(avcodec_send_packet(codecCtx, packet) < 0){
         throw(std::runtime_error("FFmpegDecoder error: avcodec_send_packet"));
       }
-      av_packet_unref(packet);
-      return true;
+      while (avcodec_receive_frame(codecCtx, frame) >= 0){
+        int outSamples = swr_convert(swrCtx, &buffer, samples,
+                          (uint8_t const **) (frame->data), frame->nb_samples);
+        while(outSamples > 0){
+          callback(buffer, maxbufferSize);
+          outSamples = swr_convert(swrCtx, &buffer, samples, NULL, 0);
+        }
+        av_frame_unref(frame);
+      }
     }
     av_packet_unref(packet);
   }
-  return false;
-}
-
-bool FFmpegDecoder::getFrameAndFillBuffer(){
-  if(avcodec_receive_frame(codecCtx, frame) < 0){
-
-  }
-}
-
-void* FFmpegDecoder::getSample(){
-
+  av_frame_free(&frame);
+  av_packet_free(&packet);
+  free(buffer);
+  isFinished = true;
 }
 
 void FFmpegDecoder::release(){
   avformat_close_input(&formatCtx);
-  av_frame_free(&frame);
-  av_packet_free(&packet);
   avcodec_free_context(&codecCtx);
   swr_free(&swrCtx);
-}
-
-bool FFmpegDecoder::finished(){
-
 }

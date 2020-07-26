@@ -3,11 +3,8 @@
 
 #include "decoder.h"
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
 #include <iostream>
+#include <unistd.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -18,22 +15,15 @@ extern "C" {
 
 class FFmpegDecoder : public Decoder{
 public:
-  FFmpegDecoder(int, AVSampleFormat, int);
+  FFmpegDecoder(int channels, AVSampleFormat sampleFormat, int sampleRate);
   ~FFmpegDecoder() override;
-  void open(char* const) override;
-  void setOutputBufferSize(int) override;
-  void* getSample() override;
-  bool finished() override;
+  void open(char* const fileName) override;
   void release() override;
+  void decode(int samples, std::function<void(void*, int)> callback) override;
 private:
-  bool getPacket();
-  bool getFrameAndFillBuffer();
   AVFormatContext* formatCtx = nullptr;
   AVCodecContext* codecCtx = nullptr;
   SwrContext* swrCtx = nullptr;
-  AVPacket* packet = nullptr;
-  uint8_t* buffer = nullptr;
-  AVFrame* frame = nullptr;
   int channels;
   int sampleRate;
   AVSampleFormat sampleFormat;
