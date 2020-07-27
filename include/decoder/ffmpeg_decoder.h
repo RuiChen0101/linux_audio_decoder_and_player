@@ -1,3 +1,4 @@
+//Copyright (c) 2020 Rui Chen
 #ifndef FFMPEG_DECODER_H
 #define FFMPEG_DECODER_H
 
@@ -17,9 +18,9 @@ class FFmpegDecoder : public Decoder{
 public:
   FFmpegDecoder(int channels, AVSampleFormat sampleFormat, int sampleRate);
   ~FFmpegDecoder() override;
-  void open(char* const fileName) override;
+  void openFile(char const fileName[]) override;
   void release() override;
-  void decode(int samples, std::function<void(void*, int)> callback) override;
+  void decode(int samples, std::function<void(void*, int, int)> callback) override;
 private:
   AVFormatContext* formatCtx = nullptr;
   AVCodecContext* codecCtx = nullptr;

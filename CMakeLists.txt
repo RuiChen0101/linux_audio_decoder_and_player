@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
 
 set(INC_LIST
   "include/decoder/decoder.h"
   "include/decoder/ffmpeg_decoder.h"
+  "include/decoder/pcm_reader.h"
   "include/player/player.h"
   "include/player/alsa_player.h"
   "include/player/pcm_dumper.h"
@@ -12,6 +15,7 @@ set(INC_LIST
 set(SRC_LIST
   "src/decoder/decoder.cpp"
   "src/decoder/ffmpeg_decoder.cpp"
+  "src/decoder/pcm_reader.cpp"
   "src/player/player.cpp"
   "src/player/alsa_player.cpp"
   "src/player/pcm_dumper.cpp"
@@ -30,9 +34,7 @@ set(COMPILE_OPTION -std=c++17 -Wfatal-errors)
 include_directories("./")
 include_directories("./include")
 include_directories("/usr/include")
-include_directories("/usr/local/include")
 link_directories("/usr/lib")
-link_directories("/usr/local/lib")
 
 #build main
 set(MAIN_TARGET decode_and_play)

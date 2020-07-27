@@ -1,3 +1,4 @@
+//Copyright (c) 2020 Rui Chen
 #include "player/pcm_dumper.h"
 
 PcmDumper::PcmDumper(char const fileName[]){
@@ -9,11 +10,11 @@ PcmDumper::~PcmDumper(){
 }
 
 void PcmDumper::play(){
-  decoder->decode(512, [&](void* buffer, int bufferSize){
-    this->callBack(buffer, bufferSize);
+  decoder->decode(512, [&](void* buffer, int bufferSize, int outSamples){
+    this->callBack(buffer, bufferSize, outSamples);
   });
 }
 
-void PcmDumper::callBack(void* buffer, int bufferSize){
+void PcmDumper::callBack(void* buffer, int bufferSize, int outSamples){
   write(fp, buffer, bufferSize);
 }

@@ -1,3 +1,4 @@
+//Copyright (c) 2020 Rui Chen
 #include "decoder/decoder.h"
 
 Decoder::~Decoder(){}

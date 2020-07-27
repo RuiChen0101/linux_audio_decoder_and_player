@@ -1,3 +1,4 @@
+//Copyright (c) 2020 Rui Chen
 #include "decoder/ffmpeg_decoder.h"
 
 FFmpegDecoder::FFmpegDecoder(int channels, AVSampleFormat sampleFormat, int sampleRate):
@@ -15,7 +16,7 @@ FFmpegDecoder::~FFmpegDecoder(){
   release();
 }
 
-void FFmpegDecoder::open(char* const fileName){
+void FFmpegDecoder::openFile(char const fileName[]){
   av_register_all();
   if(avformat_open_input(&formatCtx, fileName, NULL, NULL) < 0){
     throw(std::runtime_error("FFmpegDecoder error: avformat_open_input()"));
@@ -73,15 +74,15 @@ void FFmpegDecoder::open(char* const fileName){
   swr_init(swrCtx);
 }
 
-void FFmpegDecoder::decode(int samples, std::function<void(void*, int)> callback){
-  int maxbufferSize = av_samples_get_buffer_size(NULL, codecCtx->channels, samples, codecCtx->sample_fmt, 1);
-  std::cout << maxbufferSize << std::endl;
+void FFmpegDecoder::decode(int samples, std::function<void(void*, int, int)> callback){
+  int maxBufferSize = av_samples_get_buffer_size(NULL, codecCtx->channels, samples, codecCtx->sample_fmt, 1);
+  std::cout << "FFmpegDecoder maxBufferSize: " << maxBufferSize <<std::endl;
   AVPacket* packet = av_packet_alloc();
   AVFrame* frame = av_frame_alloc();
   if(packet == NULL || frame == NULL){
     throw(std::runtime_error("FFmpegDecoder error: packet or frame alloc fail"));
   }
-  uint8_t* buffer = (uint8_t*)av_malloc(maxbufferSize);
+  uint8_t* buffer = (uint8_t*)av_malloc(maxBufferSize);
   while (av_read_frame(formatCtx, packet) >= 0) {
     if (packet->stream_index == audioStream) {
       if(avcodec_send_packet(codecCtx, packet) < 0){
@@ -91,7 +92,7 @@ void FFmpegDecoder::decode(int samples, std::function<void(void*, int)> callback
         int outSamples = swr_convert(swrCtx, &buffer, samples,
                           (uint8_t const **) (frame->data), frame->nb_samples);
         while(outSamples > 0){
-          callback(buffer, maxbufferSize);
+          callback(buffer, maxBufferSize, outSamples);
           outSamples = swr_convert(swrCtx, &buffer, samples, NULL, 0);
         }
         av_frame_unref(frame);
